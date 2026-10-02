@@ -3,6 +3,7 @@
 return [
     'array' => 'O campo :attribute deve ser uma lista.',
     'distinct' => 'O campo :attribute está repetido.',
+    'email' => 'O campo :attribute deve ser um e-mail válido.',
     'enum' => 'O campo :attribute é inválido.',
     'integer' => 'O campo :attribute deve ser um número inteiro.',
     'max' => [
@@ -18,6 +19,8 @@ return [
     'string' => 'O campo :attribute deve ser um texto.',
 
     'attributes' => [
+        'email' => 'e-mail',
+        'password' => 'senha',
         'search' => 'busca',
         'items' => 'itens',
         'items.*.product_id' => 'produto',

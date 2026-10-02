@@ -16,6 +16,7 @@ class SaleResource extends JsonResource
             'total_cents' => $this->total_cents,
             'amount_received_cents' => $this->amount_received_cents,
             'change_cents' => $this->change_cents,
+            'operator_name' => $this->whenLoaded('operator', fn () => $this->operator->name),
             'created_at' => $this->created_at,
             'items' => SaleItemResource::collection($this->whenLoaded('items')),
         ];

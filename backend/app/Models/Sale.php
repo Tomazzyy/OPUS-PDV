@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LogicException;
 
-#[Fillable(['payment_method', 'subtotal_cents', 'total_cents', 'amount_received_cents', 'change_cents'])]
+#[Fillable(['user_id', 'payment_method', 'subtotal_cents', 'total_cents', 'amount_received_cents', 'change_cents'])]
 class Sale extends Model
 {
     protected static function booted(): void
@@ -31,5 +32,10 @@ class Sale extends Model
     public function items(): HasMany
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    public function operator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -19,4 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(fn (AuthenticationException $e) => response()->json([
+            'message' => 'Sessão expirada. Faça login novamente.',
+        ], 401));
+
+        $exceptions->render(fn (ThrottleRequestsException $e) => response()->json([
+            'message' => 'Muitas tentativas. Aguarde um minuto e tente novamente.',
+        ], 429, $e->getHeaders()));
     })->create();

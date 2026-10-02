@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\User;
 use App\Services\SaleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
+use Laravel\Sanctum\Sanctum;
 use LogicException;
 use RuntimeException;
 use Tests\TestCase;
@@ -14,6 +16,15 @@ use Tests\TestCase;
 class SaleTest extends TestCase
 {
     use RefreshDatabase;
+
+    private User $operator;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->operator = Sanctum::actingAs(User::factory()->create(['name' => 'Ana Souza']));
+    }
 
     public function test_calcula_subtotais_e_total_de_uma_venda_com_varios_itens(): void
     {
@@ -192,7 +203,7 @@ class SaleTest extends TestCase
         $this->assertThrows(fn () => app(SaleService::class)->create([
             'items' => [['product_id' => $product->id, 'quantity' => 2]],
             'payment_method' => 'debit',
-        ]), RuntimeException::class);
+        ], $this->operator), RuntimeException::class);
 
         $this->assertDatabaseCount('sales', 0);
         $this->assertDatabaseCount('sale_items', 0);
@@ -213,6 +224,7 @@ class SaleTest extends TestCase
                 'total_cents' => 4780,
                 'amount_received_cents' => 5000,
                 'change_cents' => 220,
+                'operator_name' => 'Ana Souza',
                 'items' => [[
                     'product_name' => 'X-Bacon',
                     'product_code' => '2002',

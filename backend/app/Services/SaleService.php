@@ -6,14 +6,15 @@ use App\Enums\PaymentMethod;
 use App\Exceptions\SaleException;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class SaleService
 {
-    public function create(array $data): Sale
+    public function create(array $data, User $operator): Sale
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data, $operator) {
             $products = $this->lockProducts($data['items']);
             $items = $this->buildItems($data['items'], $products);
             $total = $items->sum('subtotal_cents');
@@ -22,6 +23,7 @@ class SaleService
             [$amountReceived, $change] = $this->calculatePayment($paymentMethod, $total, $data['amount_received_cents'] ?? null);
 
             $sale = Sale::create([
+                'user_id' => $operator->id,
                 'payment_method' => $paymentMethod,
                 'subtotal_cents' => $total,
                 'total_cents' => $total,
@@ -35,7 +37,7 @@ class SaleService
                 $products[$item['product_id']]->decrement('stock_quantity', $item['quantity']);
             }
 
-            return $sale->load('items');
+            return $sale->load('items', 'operator');
         });
     }
 
