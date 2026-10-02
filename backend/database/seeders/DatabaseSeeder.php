@@ -13,8 +13,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'operador@opuspdv.test'],
-            ['name' => 'Ana Souza', 'password' => 'opuspdv123'],
+            ['email' => 'operador@pdv.com'],
+            ['name' => 'Ana Souza', 'password' => 'op123'],
         );
 
         $this->call(ProductSeeder::class);
