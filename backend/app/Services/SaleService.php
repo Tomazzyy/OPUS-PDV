@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\PaymentMethod;
 use App\Exceptions\SaleException;
 use App\Models\Product;
 use App\Models\Sale;
@@ -13,28 +14,47 @@ class SaleService
     public function create(array $data): Sale
     {
         return DB::transaction(function () use ($data) {
-            $items = $this->buildItems($data['items']);
-            $subtotal = $items->sum('subtotal_cents');
+            $products = $this->lockProducts($data['items']);
+            $items = $this->buildItems($data['items'], $products);
+            $total = $items->sum('subtotal_cents');
+
+            $paymentMethod = PaymentMethod::from($data['payment_method']);
+            [$amountReceived, $change] = $this->calculatePayment($paymentMethod, $total, $data['amount_received_cents'] ?? null);
 
             $sale = Sale::create([
-                'payment_method' => $data['payment_method'],
-                'subtotal_cents' => $subtotal,
-                'total_cents' => $subtotal,
+                'payment_method' => $paymentMethod,
+                'subtotal_cents' => $total,
+                'total_cents' => $total,
+                'amount_received_cents' => $amountReceived,
+                'change_cents' => $change,
             ]);
 
             $sale->items()->createMany($items->all());
+
+            foreach ($items as $item) {
+                $products[$item['product_id']]->decrement('stock_quantity', $item['quantity']);
+            }
 
             return $sale->load('items');
         });
     }
 
-    private function buildItems(array $items): Collection
+    /**
+     * Bloqueia as linhas dos produtos até o fim da transação, para que duas
+     * vendas simultâneas não vendam o mesmo estoque.
+     */
+    private function lockProducts(array $items): Collection
     {
-        $products = Product::query()
+        return Product::query()
             ->whereIn('id', array_column($items, 'product_id'))
+            ->orderBy('id')
+            ->lockForUpdate()
             ->get()
             ->keyBy('id');
+    }
 
+    private function buildItems(array $items, Collection $products): Collection
+    {
         return collect($items)->map(function (array $item) use ($products) {
             $product = $products->get($item['product_id']);
 
@@ -46,6 +66,10 @@ class SaleService
                 throw new SaleException("O produto {$product->name} não está disponível para venda.");
             }
 
+            if ($product->stock_quantity < $item['quantity']) {
+                throw new SaleException("Estoque insuficiente para {$product->name}. Disponível: {$product->stock_quantity}.");
+            }
+
             return [
                 'product_id' => $product->id,
                 'product_name' => $product->name,
@@ -55,5 +79,18 @@ class SaleService
                 'subtotal_cents' => $product->price_cents * $item['quantity'],
             ];
         });
+    }
+
+    private function calculatePayment(PaymentMethod $paymentMethod, int $total, ?int $amountReceived): array
+    {
+        if ($paymentMethod !== PaymentMethod::Cash) {
+            return [null, null];
+        }
+
+        if ($amountReceived < $total) {
+            throw new SaleException('Valor recebido insuficiente.');
+        }
+
+        return [$amountReceived, $amountReceived - $total];
     }
 }

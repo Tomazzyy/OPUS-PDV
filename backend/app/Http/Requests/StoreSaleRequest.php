@@ -15,6 +15,7 @@ class StoreSaleRequest extends FormRequest
             'items.*.product_id' => ['required', 'integer', 'distinct'],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:9999'],
             'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
+            'amount_received_cents' => ['exclude_unless:payment_method,cash', 'required', 'integer', 'min:1', 'max:10000000'],
         ];
     }
 }

@@ -23,5 +23,6 @@ return [
         'items.*.product_id' => 'produto',
         'items.*.quantity' => 'quantidade',
         'payment_method' => 'forma de pagamento',
+        'amount_received_cents' => 'valor recebido',
     ],
 ];
