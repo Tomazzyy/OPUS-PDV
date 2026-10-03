@@ -5,9 +5,10 @@ import './ProductSearch.css'
 type ProductSearchProps = {
   value: string
   onChange: (value: string) => void
+  onSubmit: (value: string) => void
 }
 
-export function ProductSearch({ value, onChange }: ProductSearchProps) {
+export function ProductSearch({ value, onChange, onSubmit }: ProductSearchProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -36,7 +37,10 @@ export function ProductSearch({ value, onChange }: ProductSearchProps) {
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        onKeyDown={(event) => event.key === 'Escape' && onChange('')}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') onSubmit(value)
+          if (event.key === 'Escape') onChange('')
+        }}
         placeholder="Buscar produto por nome ou código..."
         aria-label="Buscar produto"
         autoFocus
