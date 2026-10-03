@@ -38,6 +38,8 @@ export type Sale = {
   items: SaleItem[]
 }
 
+export type SaleSummary = Omit<Sale, 'items'>
+
 export type NewSale = {
   items: { product_id: number; quantity: number }[]
   payment_method: PaymentMethod

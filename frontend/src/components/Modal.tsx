@@ -25,7 +25,7 @@ export function Modal({ onClose, canClose = true, className = '', children }: Mo
       className={`modal ${className}`}
       onCancel={(event) => {
         event.preventDefault()
-        if (canClose) onClose()
+        if (canClose && event.target === event.currentTarget) onClose()
       }}
     >
       {canClose && (

@@ -1,4 +1,4 @@
-import type { NewSale, Product, Sale, User } from '../types'
+import type { NewSale, Product, Sale, SaleSummary, User } from '../types'
 
 const TOKEN_KEY = 'opuspdv_token'
 
@@ -84,6 +84,10 @@ export function getProducts(search = '', signal?: AbortSignal) {
   const query = search ? `?search=${encodeURIComponent(search)}` : ''
 
   return request<Product[]>(`/products${query}`, { signal })
+}
+
+export function getSales() {
+  return request<SaleSummary[]>('/sales')
 }
 
 export function getSale(id: number) {

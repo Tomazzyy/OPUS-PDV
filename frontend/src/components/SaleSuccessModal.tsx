@@ -1,7 +1,9 @@
-import { CircleCheck } from 'lucide-react'
+import { useState } from 'react'
+import { CircleCheck, ReceiptText } from 'lucide-react'
 import type { Sale } from '../types'
 import { formatDateTime, formatMoney, paymentMethodLabels } from '../utils/format'
 import { Modal } from './Modal'
+import { SaleReceipt } from './SaleReceipt'
 import './SaleSuccessModal.css'
 
 type SaleSuccessModalProps = {
@@ -10,6 +12,8 @@ type SaleSuccessModalProps = {
 }
 
 export function SaleSuccessModal({ sale, onNewSale }: SaleSuccessModalProps) {
+  const [showReceipt, setShowReceipt] = useState(false)
+
   return (
     <Modal onClose={onNewSale} className="sale-success">
       <div className="sale-success-header">
@@ -45,9 +49,17 @@ export function SaleSuccessModal({ sale, onNewSale }: SaleSuccessModalProps) {
         )}
       </dl>
 
-      <button className="btn btn-primary btn-lg sale-success-action" onClick={onNewSale} data-autofocus>
-        Nova venda
-      </button>
+      <div className="sale-success-actions">
+        <button className="btn btn-secondary btn-lg" onClick={() => setShowReceipt(true)}>
+          <ReceiptText size={18} />
+          Ver comprovante
+        </button>
+        <button className="btn btn-primary btn-lg" onClick={onNewSale} data-autofocus>
+          Nova venda
+        </button>
+      </div>
+
+      {showReceipt && <SaleReceipt sale={sale} onClose={() => setShowReceipt(false)} />}
     </Modal>
   )
 }
