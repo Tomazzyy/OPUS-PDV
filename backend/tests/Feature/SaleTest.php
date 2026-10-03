@@ -240,6 +240,20 @@ class SaleTest extends TestCase
             ->assertJson(['message' => 'Venda não encontrada.']);
     }
 
+    public function test_lista_as_vendas_mais_recentes_primeiro(): void
+    {
+        $product = Product::factory()->create();
+        $first = $this->sell([['product_id' => $product->id, 'quantity' => 1]])->json('data.id');
+        $second = $this->sell([['product_id' => $product->id, 'quantity' => 2]])->json('data.id');
+
+        $this->getJson('/api/sales')
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $second)
+            ->assertJsonPath('data.1.id', $first)
+            ->assertJsonPath('data.0.operator_name', 'Ana Souza')
+            ->assertJsonMissingPath('data.0.items');
+    }
+
     private function sell(array $items, string $paymentMethod = 'debit', ?int $amountReceived = null): TestResponse
     {
         return $this->postJson('/api/sales', array_filter([

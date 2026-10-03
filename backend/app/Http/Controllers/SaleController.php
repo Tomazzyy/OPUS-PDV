@@ -9,6 +9,13 @@ use App\Services\SaleService;
 
 class SaleController extends Controller
 {
+    public function index()
+    {
+        $sales = Sale::with('operator')->latest('id')->paginate(20);
+
+        return SaleResource::collection($sales);
+    }
+
     public function store(StoreSaleRequest $request, SaleService $saleService)
     {
         $sale = $saleService->create($request->validated(), $request->user());

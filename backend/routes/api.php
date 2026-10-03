@@ -16,6 +16,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ->missing(fn () => response()->json(['message' => 'Produto não encontrado.'], 404));
 
     Route::apiResource('sales', SaleController::class)
-        ->only(['store', 'show'])
+        ->only(['index', 'store', 'show'])
         ->missing(fn () => response()->json(['message' => 'Venda não encontrada.'], 404));
 });
