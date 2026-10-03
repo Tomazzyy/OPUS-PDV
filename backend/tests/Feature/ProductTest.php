@@ -21,13 +21,14 @@ class ProductTest extends TestCase
 
     public function test_lista_apenas_produtos_ativos(): void
     {
-        Product::factory()->create(['name' => 'Coca-Cola 350ml']);
+        Product::factory()->create(['name' => 'Coca-Cola 350ml', 'image_path' => 'images/products/1001.jpg']);
         Product::factory()->inactive()->create(['name' => 'Milk-shake']);
 
         $this->getJson('/api/products')
             ->assertOk()
             ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.name', 'Coca-Cola 350ml');
+            ->assertJsonPath('data.0.name', 'Coca-Cola 350ml')
+            ->assertJsonPath('data.0.image_url', asset('images/products/1001.jpg'));
     }
 
     public function test_busca_produtos_por_nome_ou_codigo(): void

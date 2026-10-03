@@ -30,7 +30,10 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $product) {
-            Product::updateOrCreate(['code' => $product['code']], $product);
+            Product::updateOrCreate(
+                ['code' => $product['code']],
+                [...$product, 'image_path' => "images/products/{$product['code']}.jpg"],
+            );
         }
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['name', 'code', 'price_cents', 'stock_quantity', 'active'])]
+#[Fillable(['name', 'code', 'image_path', 'price_cents', 'stock_quantity', 'active'])]
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
