@@ -8,6 +8,7 @@ export type Product = {
   id: number
   name: string
   code: string
+  image_url: string | null
   price_cents: number
   stock_quantity: number
   active: boolean
