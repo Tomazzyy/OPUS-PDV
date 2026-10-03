@@ -1,19 +1,37 @@
 import { useRef, useState } from 'react'
 import { Cart } from '../components/Cart'
+import { PaymentModal } from '../components/PaymentModal'
 import { ProductList } from '../components/ProductList'
 import { ProductSearch } from '../components/ProductSearch'
+import { SaleSuccessModal } from '../components/SaleSuccessModal'
 import { useCart } from '../hooks/useCart'
 import { useProducts } from '../hooks/useProducts'
 import { getProducts } from '../services/api'
-import type { Product } from '../types'
+import type { Product, Sale } from '../types'
 import './CheckoutPage.css'
 
 export function CheckoutPage() {
   const [search, setSearch] = useState('')
   const [notice, setNotice] = useState('')
+  const [paying, setPaying] = useState(false)
+  const [completedSale, setCompletedSale] = useState<Sale | null>(null)
   const noticeTimer = useRef<number>(undefined)
+  const searchRef = useRef<HTMLInputElement>(null)
   const { products, loading, error, retry } = useProducts(search)
   const cart = useCart()
+
+  function completeSale(sale: Sale) {
+    setPaying(false)
+    setCompletedSale(sale)
+    cart.clear()
+    retry()
+  }
+
+  function startNewSale() {
+    setCompletedSale(null)
+    setSearch('')
+    setTimeout(() => searchRef.current?.focus())
+  }
 
   function showNotice(message: string) {
     setNotice(message)
@@ -66,7 +84,7 @@ export function CheckoutPage() {
   return (
     <div className="checkout">
       <section className="checkout-products card">
-        <ProductSearch value={search} onChange={setSearch} onSubmit={addByCode} />
+        <ProductSearch value={search} onChange={setSearch} onSubmit={addByCode} inputRef={searchRef} />
         {notice && (
           <p className="checkout-notice" role="alert">
             {notice}
@@ -86,8 +104,20 @@ export function CheckoutPage() {
         onDecrease={cart.decrease}
         onRemove={cart.remove}
         onClear={cart.clear}
-        onCheckout={() => {}}
+        onCheckout={() => setPaying(true)}
       />
+
+      {paying && (
+        <PaymentModal
+          items={cart.items}
+          totalCents={cart.totalCents}
+          onClose={() => setPaying(false)}
+          onCompleted={completeSale}
+          onFailed={retry}
+        />
+      )}
+
+      {completedSale && <SaleSuccessModal sale={completedSale} onNewSale={startNewSale} />}
     </div>
   )
 }

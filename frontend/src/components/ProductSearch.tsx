@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, type RefObject } from 'react'
 import { Search, X } from 'lucide-react'
 import './ProductSearch.css'
 
@@ -6,11 +6,10 @@ type ProductSearchProps = {
   value: string
   onChange: (value: string) => void
   onSubmit: (value: string) => void
+  inputRef: RefObject<HTMLInputElement | null>
 }
 
-export function ProductSearch({ value, onChange, onSubmit }: ProductSearchProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
-
+export function ProductSearch({ value, onChange, onSubmit, inputRef }: ProductSearchProps) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -22,7 +21,7 @@ export function ProductSearch({ value, onChange, onSubmit }: ProductSearchProps)
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [inputRef])
 
   function clear() {
     onChange('')

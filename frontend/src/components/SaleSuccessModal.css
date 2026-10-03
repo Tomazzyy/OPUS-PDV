@@ -1,0 +1,75 @@
+.sale-success-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.sale-success-header svg {
+  margin-bottom: 8px;
+  color: var(--success);
+}
+
+.sale-success-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.sale-success-header p {
+  color: var(--text-muted);
+}
+
+.sale-success-details {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.sale-success-details div {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+}
+
+.sale-success-details div:last-child {
+  border-bottom: 0;
+}
+
+.sale-success-details dt {
+  color: var(--text-muted);
+}
+
+.sale-success-details dd {
+  margin: 0;
+  font-weight: 500;
+}
+
+.sale-success-total dd {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sale-success-change {
+  background: var(--success-soft);
+  border-radius: 0 0 9px 9px;
+}
+
+.sale-success-change dt,
+.sale-success-change dd {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.sale-success-change dd {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sale-success-action {
+  width: 100%;
+  margin-top: 20px;
+}
