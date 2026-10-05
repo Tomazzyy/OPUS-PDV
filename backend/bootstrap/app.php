@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -25,6 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn (AuthenticationException $e) => response()->json([
             'message' => 'Sessão expirada. Faça login novamente.',
         ], 401));
+
+        $exceptions->render(fn (AccessDeniedHttpException $e) => response()->json([
+            'message' => 'Acesso permitido apenas para administradores.',
+        ], 403));
 
         $exceptions->render(fn (ThrottleRequestsException $e) => response()->json([
             'message' => 'Muitas tentativas. Aguarde um minuto e tente novamente.',

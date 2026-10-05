@@ -2,6 +2,15 @@ export type User = {
   id: number
   name: string
   email: string
+  role: 'admin' | 'operator'
+}
+
+export type ProductInput = {
+  name: string
+  code: string
+  price_cents: number
+  stock_quantity?: number
+  active: boolean
 }
 
 export type Product = {
@@ -39,6 +48,13 @@ export type Sale = {
 }
 
 export type SaleSummary = Omit<Sale, 'items'>
+
+export type DailySummary = {
+  date: string
+  sales_count: number
+  total_cents: number
+  payment_methods: Record<PaymentMethod, { sales_count: number; total_cents: number }>
+}
 
 export type NewSale = {
   items: { product_id: number; quantity: number }[]

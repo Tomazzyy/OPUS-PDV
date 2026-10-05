@@ -30,6 +30,13 @@ return [
 
     'disks' => [
 
+        'product_images' => [
+            'driver' => 'local',
+            'root' => public_path('images/products/uploads'),
+            'throw' => false,
+            'report' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),

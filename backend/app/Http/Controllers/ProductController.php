@@ -18,12 +18,7 @@ class ProductController extends Controller
 
         $products = Product::query()
             ->where('active', true)
-            ->when($search !== '', function ($query) use ($search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('code', 'like', "{$search}%");
-                });
-            })
+            ->when($search !== '', fn ($query) => $query->search($search))
             ->orderBy('name')
             ->get();
 

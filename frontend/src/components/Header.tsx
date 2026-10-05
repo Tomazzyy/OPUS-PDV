@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react'
-import { LogOut, ReceiptText, ShoppingCart, Store, UserRound } from 'lucide-react'
+import { LogOut, Package, ReceiptText, ShoppingCart, Store, UserRound } from 'lucide-react'
 import { formatDateTime } from '../utils/format'
 import './Header.css'
 
-export type Page = 'checkout' | 'lookup'
+export type Page = 'checkout' | 'sales' | 'products'
 
 type HeaderProps = {
   page: Page
   onNavigate: (page: Page) => void
   operatorName: string
+  isAdmin: boolean
   onLogout: () => void
 }
 
-export function Header({ page, onNavigate, operatorName, onLogout }: HeaderProps) {
+export function Header({ page, onNavigate, operatorName, isAdmin, onLogout }: HeaderProps) {
   const now = useNow()
 
   return (
@@ -33,10 +34,16 @@ export function Header({ page, onNavigate, operatorName, onLogout }: HeaderProps
           <ShoppingCart size={16} />
           <span className="header-label">Caixa</span>
         </button>
-        <button className={page === 'lookup' ? 'active' : ''} onClick={() => onNavigate('lookup')}>
+        <button className={page === 'sales' ? 'active' : ''} onClick={() => onNavigate('sales')}>
           <ReceiptText size={16} />
-          <span className="header-label">Consultar venda</span>
+          <span className="header-label">Vendas</span>
         </button>
+        {isAdmin && (
+          <button className={page === 'products' ? 'active' : ''} onClick={() => onNavigate('products')}>
+            <Package size={16} />
+            <span className="header-label">Produtos</span>
+          </button>
+        )}
       </nav>
 
       <div className="header-info">

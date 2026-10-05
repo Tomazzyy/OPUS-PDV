@@ -4,7 +4,7 @@ import type { Product } from '../types'
 
 const SEARCH_DELAY_MS = 300
 
-export function useProducts(search: string) {
+export function useProducts(search: string, loadProducts = getProducts) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -18,7 +18,7 @@ export function useProducts(search: string) {
         setLoading(true)
         setError(false)
 
-        getProducts(search.trim(), controller.signal)
+        loadProducts(search.trim(), controller.signal)
           .then(setProducts)
           .catch(() => {
             if (!controller.signal.aborted) {
@@ -38,7 +38,7 @@ export function useProducts(search: string) {
       clearTimeout(timer)
       controller.abort()
     }
-  }, [search, attempt])
+  }, [search, attempt, loadProducts])
 
   return { products, loading, error, retry: () => setAttempt((value) => value + 1) }
 }

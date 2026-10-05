@@ -5,6 +5,7 @@ import { ApiError, createSale } from '../services/api'
 import type { PaymentMethod, Sale } from '../types'
 import { formatMoney, paymentMethodLabels } from '../utils/format'
 import { Modal } from './Modal'
+import { MoneyInput } from './MoneyInput'
 import './PaymentModal.css'
 
 type PaymentModalProps = {
@@ -85,13 +86,7 @@ export function PaymentModal({ items, totalCents, onClose, onCompleted, onFailed
           <div className="payment-cash">
             <label className="field">
               <span>Valor recebido</span>
-              <input
-                className="payment-received"
-                inputMode="numeric"
-                value={formatMoney(receivedCents)}
-                onChange={(event) => setReceivedCents(Number(event.target.value.replace(/\D/g, '').slice(-9)))}
-                data-autofocus
-              />
+              <MoneyInput className="payment-received" value={receivedCents} onChange={setReceivedCents} data-autofocus />
             </label>
 
             <div className="payment-suggestions">

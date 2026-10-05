@@ -3,7 +3,8 @@ import { Header, type Page } from './components/Header'
 import { useAuth } from './hooks/useAuth'
 import { CheckoutPage } from './pages/CheckoutPage'
 import { LoginPage } from './pages/LoginPage'
-import { SaleLookupPage } from './pages/SaleLookupPage'
+import { ProductsAdminPage } from './pages/ProductsAdminPage'
+import { SalesPage } from './pages/SalesPage'
 import './App.css'
 
 function App() {
@@ -18,10 +19,25 @@ function App() {
     return <LoginPage onLogin={signIn} />
   }
 
+  const isAdmin = user.role === 'admin'
+
   return (
     <div className="app">
-      <Header page={page} onNavigate={setPage} operatorName={user.name} onLogout={signOut} />
-      <main className="app-content">{page === 'checkout' ? <CheckoutPage /> : <SaleLookupPage />}</main>
+      <Header
+        page={page}
+        onNavigate={setPage}
+        operatorName={user.name}
+        isAdmin={isAdmin}
+        onLogout={() => {
+          setPage('checkout')
+          signOut()
+        }}
+      />
+      <main className="app-content">
+        {page === 'checkout' && <CheckoutPage />}
+        {page === 'sales' && <SalesPage />}
+        {page === 'products' && isAdmin && <ProductsAdminPage />}
+      </main>
     </div>
   )
 }

@@ -45,6 +45,20 @@ class ProductTest extends TestCase
             ->assertJsonPath('data.0.name', 'X-Bacon');
     }
 
+    public function test_busca_ignora_acentos_e_maiusculas(): void
+    {
+        Product::factory()->create(['name' => 'Água Mineral 500ml']);
+        Product::factory()->create(['name' => 'Pão de Queijo']);
+
+        foreach (['agua', 'água', 'ÁGUA', 'Agua Mineral'] as $term) {
+            $this->getJson('/api/products?search='.urlencode($term))
+                ->assertJsonCount(1, 'data')
+                ->assertJsonPath('data.0.name', 'Água Mineral 500ml');
+        }
+
+        $this->getJson('/api/products?search=pao')->assertJsonPath('data.0.name', 'Pão de Queijo');
+    }
+
     public function test_retorna_404_para_produto_inexistente(): void
     {
         $this->getJson('/api/products/999')

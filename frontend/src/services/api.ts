@@ -1,4 +1,4 @@
-import type { NewSale, Product, Sale, SaleSummary, User } from '../types'
+import type { DailySummary, NewSale, Product, ProductInput, Sale, SaleSummary, User } from '../types'
 
 const TOKEN_KEY = 'opuspdv_token'
 
@@ -32,8 +32,12 @@ export function setToken(token: string | null) {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const headers: Record<string, string> = { Accept: 'application/json', 'Content-Type': 'application/json' }
+  const headers: Record<string, string> = { Accept: 'application/json' }
   const token = getToken()
+
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json'
+  }
 
   if (token) {
     headers.Authorization = `Bearer ${token}`
@@ -86,8 +90,45 @@ export function getProducts(search = '', signal?: AbortSignal) {
   return request<Product[]>(`/products${query}`, { signal })
 }
 
-export function getSales() {
-  return request<SaleSummary[]>('/sales')
+export function getAdminProducts(search = '', signal?: AbortSignal) {
+  const query = search ? `?search=${encodeURIComponent(search)}` : ''
+
+  return request<Product[]>(`/admin/products${query}`, { signal })
+}
+
+export function createProduct(product: ProductInput) {
+  return request<Product>('/admin/products', { method: 'POST', body: JSON.stringify(product) })
+}
+
+export function updateProduct(id: number, changes: Partial<ProductInput>) {
+  return request<Product>(`/admin/products/${id}`, { method: 'PATCH', body: JSON.stringify(changes) })
+}
+
+export function adjustStock(id: number, quantity: number) {
+  return request<Product>(`/admin/products/${id}/stock`, { method: 'POST', body: JSON.stringify({ quantity }) })
+}
+
+export function uploadProductImage(id: number, file: File) {
+  const body = new FormData()
+  body.append('image', file)
+
+  return request<Product>(`/admin/products/${id}/image`, { method: 'POST', body })
+}
+
+export function setProductImageUrl(id: number, imageUrl: string) {
+  return request<Product>(`/admin/products/${id}/image`, { method: 'POST', body: JSON.stringify({ image_url: imageUrl }) })
+}
+
+export function removeProductImage(id: number) {
+  return request<Product>(`/admin/products/${id}/image`, { method: 'DELETE' })
+}
+
+export function getSales(date: string) {
+  return request<SaleSummary[]>(`/sales?date=${date}`)
+}
+
+export function getDailySummary(date: string) {
+  return request<DailySummary>(`/sales/summary?date=${date}`)
 }
 
 export function getSale(id: number) {
